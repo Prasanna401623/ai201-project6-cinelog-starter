@@ -1,7 +1,7 @@
 # PR Response Doc — CineLog Watchlist Feature
 
 ## AI Usage
-<!-- Fill in at the end — how you used AI tools during this project -->
+I used AI assistance in this project. 
 
 ## Comment 1 — Rename
 **What I did:** Renamed `save_to_watchlist()` to `add_to_watchlist()` in `services/watchlist_service.py`, updating the docstring to match. Updated the one call site in `routes/watchlist/watchlist.py` (both the import statement and the function call inside `add_film()`).
@@ -30,5 +30,23 @@
 **How I resolved it:** Merged the `.gitignore` conflict by keeping both branches' entries. For the missing `WatchlistEntry` model, I manually re-added the class to `models.py`, changing `film_id` from `db.Integer` to `db.String(36)` to match the UUID refactor. I also updated the stale integer-based docstrings and comments in `services/watchlist_service.py` and `routes/watchlist/watchlist.py`, and changed the fake film ID in `tests/test_watchlist.py` from an integer literal to a UUID-format string to stay consistent with the rest of the codebase.
 **How I verified no conflict remains:** Ran `pytest tests/ -v` after the fix — all 5 tests pass. Confirmed `git log --oneline --graph` shows a fully linear history with no merge commits, sitting cleanly on top of `origin/main`.
 
+### Screenshot — git log --oneline
+![git log showing rewritten conventional commits](docs/git-log-screenshot.png)
+
 ## PR Description
-<!-- Written at the end — feature overview, design decisions, manual testing steps -->
+
+### What this feature does
+Adds a watchlist feature to CineLog, allowing users to save films they intend to watch later, separate from their collection of already-watched films. Includes a `WatchlistEntry` model, service functions (`add_to_watchlist`, `get_watchlist`), and REST endpoints (`GET /watchlist/<user_id>`, `POST /watchlist/<user_id>/add`).
+
+### Design decisions
+- **Default visibility:** Watchlists default to `public=False` (private). Watchlists can reveal personal or embarrassing viewing preferences, so users are opted into privacy by default rather than exposure. This trades off some of CineLog's social discovery value, which can be recovered later via an explicit visibility toggle.
+- **Sort order:** Watchlists are sorted by `date_added` descending (most recent first), matching the reviewer's preference and staying consistent with how `get_collection()` already sorts entries.
+
+### How to manually test
+1. Start the app: `python app.py`
+2. Create a user and a film via the appropriate endpoints (or seed data, if available).
+3. Add a film to the watchlist:
+4. View the watchlist: `GET /watchlist/<user_id>` — confirm the film appears.
+5. Attempt to add the same film again — confirm an `AlreadyInWatchlistError` is raised (duplicate not created).
+6. Attempt to add a nonexistent `film_id` — confirm a `FilmNotFoundError` is raised.
+7. Add a second film and confirm `GET /watchlist/<user_id>` returns it before the first (newest first, by `date_added`).
