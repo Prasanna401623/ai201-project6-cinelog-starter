@@ -21,9 +21,9 @@
 **Tradeoff acknowledged:** This costs CineLog some of its "community" discovery value — if watchlists are private by default, users can't stumble on friends' saved films as easily, which risks feeling less social and could cost engagement. To offset that, `public` stays available as an explicit per-list toggle (see stretch feature), so users who want the social discovery aspect can opt in rather than being defaulted into it.
 
 ## Comment 5 — Sort order
-**My position:**
-**Reasoning:**
-**Engagement with reviewer's point:**
+**My position:** Agreed — sort watchlist by `date_added` descending (most recent first), not alphabetical.
+**Reasoning:** Users adding films to a watchlist are usually acting on a recent impulse (a recommendation, a trailer, a conversation) and want to see what they just added at the top, not buried alphabetically. This also matches `get_collection()`'s existing sort behavior, keeping the two features consistent.
+**Engagement with reviewer's point:** The reviewer's reasoning — that most users want to see what they added recently — matches the existing pattern in `collection_service.py`, so implementing it also improves consistency across the app rather than introducing a one-off sort rule just for watchlists.
 
 ## Comment 6 — Rebase
 **What conflicted:**
