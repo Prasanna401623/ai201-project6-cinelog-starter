@@ -26,9 +26,9 @@
 **Engagement with reviewer's point:** The reviewer's reasoning — that most users want to see what they added recently — matches the existing pattern in `collection_service.py`, so implementing it also improves consistency across the app rather than introducing a one-off sort rule just for watchlists.
 
 ## Comment 6 — Rebase
-**What conflicted:**
-**How I resolved it:**
-**How I verified no conflict remains:**
+**What conflicted:** Rebasing onto `main` surfaced two issues: (1) a textual conflict in `.gitignore`, since both branches added one independently, and (2) a silent structural conflict — the `main` branch's UUID refactor (`refactor: migrate film IDs from integer to UUID`) rewrote `models.py`'s `Film` and `CollectionEntry` classes, and when my branch's commit tried to add the new `WatchlistEntry` class to the same file, git applied the patch without an explicit conflict marker but silently dropped the `WatchlistEntry` class entirely, since the surrounding lines it expected no longer matched.
+**How I resolved it:** Merged the `.gitignore` conflict by keeping both branches' entries. For the missing `WatchlistEntry` model, I manually re-added the class to `models.py`, changing `film_id` from `db.Integer` to `db.String(36)` to match the UUID refactor. I also updated the stale integer-based docstrings and comments in `services/watchlist_service.py` and `routes/watchlist/watchlist.py`, and changed the fake film ID in `tests/test_watchlist.py` from an integer literal to a UUID-format string to stay consistent with the rest of the codebase.
+**How I verified no conflict remains:** Ran `pytest tests/ -v` after the fix — all 5 tests pass. Confirmed `git log --oneline --graph` shows a fully linear history with no merge commits, sitting cleanly on top of `origin/main`.
 
 ## PR Description
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
